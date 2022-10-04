@@ -61,7 +61,7 @@ kubectl get node -o wide
 
 
 echo ".........----------------#################._.-.-Java and MAVEN-.-._.#################----------------........."
-sudo apt install openjdk-8-jdk -y
+sudo apt install openjdk-11-jre -y
 java -version
 sudo apt install -y maven
 mvn -v
@@ -69,15 +69,18 @@ mvn -v
 
 
 echo ".........----------------#################._.-.-JENKINS-.-._.#################----------------........."
-wget -q -O - https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo apt-key add -
-sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
-sudo apt update
-sudo apt install -y jenkins
-systemctl daemon-reload
-systemctl enable jenkins
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io.key | sudo tee \
+  /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+  
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
+  
+sudo apt-get update
+sudo apt-get install jenkins -y
+sudo systemctl enable jenkins
 sudo systemctl start jenkins
-#sudo systemctl status jenkins
 sudo usermod -a -G docker jenkins
-echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-
+sudo systemctl status jenkins
+  
 echo ".........----------------#################._.-.-COMPLETED-.-._.#################----------------........."
